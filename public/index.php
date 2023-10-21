@@ -32,14 +32,11 @@ function _request($method, $endpoint, $headers=[], $payload=null) {
 
     if ($payload != null) {
         $data = json_encode($payload);
-        error_log(print_r($data, true));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     }
 
     $response = curl_exec($ch);
     curl_close($ch);
-
-error_log(print_r($response, true));
 
     $obj = json_decode($response);
 
@@ -93,9 +90,6 @@ function update_dns($domain_name, $ip_address) {
         'name' => $domain_name,
         'target' => $ip_address
     ];
-
-    error_log(print_r($domain_id, true));
-    error_log(print_r($record_id, true));
 
     _request($method, $endpoint, $headers, $payload);
 }
