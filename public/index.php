@@ -92,6 +92,9 @@ function update_dns($domain_name, $ip_address) {
     ];
 
     _request($method, $endpoint, $headers, $payload);
+
+    // TODO: actually check for success and return failure if so
+    echo "good"; // TODO: implement "nochg"
 }
 
 
