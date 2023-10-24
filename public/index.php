@@ -62,30 +62,48 @@ function get_domain_id($domain_name) {
 }
 
 
-function get_record_id($domain_id, $name, $type) {
+function get_record($domain_id, $name, $type) {
     $method = 'GET';
     $endpoint = '/domains/' . $domain_id . '/records';
 
-    $record_id = null;
+    $target_record = null;
     $record_list = _request($method, $endpoint);
 
     foreach($record_list as $record) {
         if ($record->name == $name && $record->type == $type) {
-            $record_id = $record->id;
+            $target_record = $record;
+            break;
         }
     }
 
-    return $record_id;
+    return $target_record;
+}
+
+function validate_ip_address($ip_address) {
+    return filter_var($ip_address, FILTER_VALIDATE_IP);
 }
 
 
+// TODO: More failure checks
 function update_dns($domain_name, $ip_address) {
+    if (validate_ip_address($ip_address) == false) {
+        echo "fail";
+
+        return false;
+    }
+
     $domain_id = get_domain_id($domain_name);
-    $record_id = get_record_id($domain_id, '', 'A');
+    $record = get_record($domain_id, '', 'A');
+
+    if ($record->target == $ip_address) {
+        echo "nochg";
+
+        return true;
+    }
 
     $method = 'PUT';
     $headers = ['Content-Type: application/json'];
-    $endpoint = '/domains/' . $domain_id . '/records/' . $record_id;
+    $endpoint = '/domains/' . $domain_id . '/records/' . $record->id;
     $payload = [
         'name' => $domain_name,
         'target' => $ip_address
@@ -93,8 +111,9 @@ function update_dns($domain_name, $ip_address) {
 
     _request($method, $endpoint, $headers, $payload);
 
-    // TODO: actually check for success and return failure if so
-    echo "good"; // TODO: implement "nochg"
+    echo "good";
+
+    return true;
 }
 
 
