@@ -124,7 +124,10 @@ function main() {
     $password = $_SERVER['PHP_AUTH_PW'];
 
     if (authenticate($username, $password) != true) {
-        die('401');
+        http_response_code(401);
+        echo '<h1>401 - Unauthorized</h1>';
+
+        exit;
     }
 
     $domain_name = $config['domain_name'];
